@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101418">
+<title>Power Hypertrophy — Trainings-App</title>
+<style>
+:root{color-scheme:dark;--bg:#0c1014;--panel:#151b21;--panel2:#1c242c;--line:#2a3540;--text:#f1f5f9;--muted:#9eacba;--accent:#b6f36b;--accentText:#17210b;--danger:#ff8f8f;--radius:16px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:11px 14px;border-radius:12px;font-weight:650}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--accent);color:var(--accentText);border-color:var(--accent)}button.ghost{background:transparent}button.small{padding:7px 10px;font-size:14px}button:disabled{opacity:.45;cursor:not-allowed}
+header{padding:22px 18px 16px;max-width:1050px;margin:auto} .eyebrow{color:var(--accent);font-size:12px;letter-spacing:.14em;font-weight:800;text-transform:uppercase}h1{font-size:clamp(25px,5vw,38px);line-height:1.08;margin:7px 0}p{margin:6px 0;color:var(--muted)}main{max-width:1050px;margin:auto;padding:0 14px 40px}
+.topbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 18px}.daytabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}.daytab{padding:12px 6px;text-align:center}.daytab.active{background:var(--accent);color:var(--accentText);border-color:var(--accent)}.daytab span{display:block;font-size:12px;opacity:.8;font-weight:500}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:12px 0 18px}.stat,.card,.exercise{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius)}.stat{padding:12px}.stat strong{display:block;font-size:22px}.stat span{font-size:12px;color:var(--muted)}
+.sessionhead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin:16px 0}.sessionhead h2{margin:0;font-size:23px}.sessionhead p{font-size:14px}.progress{height:6px;border-radius:20px;background:var(--line);overflow:hidden;margin:12px 0 16px}.progress div{height:100%;width:0;background:var(--accent);transition:width .2s}
+.exercise{padding:14px;margin:10px 0}.exercise.done{border-color:#52713c}.exercise.done .exname{text-decoration:line-through;text-decoration-color:#78995c}.exhead{display:flex;align-items:flex-start;gap:10px}.num{width:31px;height:31px;border-radius:9px;background:var(--panel2);display:grid;place-items:center;font-weight:800;flex-shrink:0}.exmain{flex:1;min-width:0}.exname{font-size:16px;font-weight:800}.exmeta{font-size:13px;color:var(--muted);margin-top:3px}.check{width:26px;height:26px;accent-color:var(--accent);margin-top:2px;flex-shrink:0}
+.sets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:13px}.setbox{background:var(--panel2);padding:10px;border-radius:12px}.settitle{font-size:12px;color:var(--muted);font-weight:700;margin-bottom:7px}.fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}.field input{width:100%;min-width:0;padding:9px 8px;border:1px solid var(--line);border-radius:9px;background:#0d1217;color:var(--text)}
+.exnote{font-size:13px;color:var(--muted);margin-top:10px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.card{padding:15px;margin:12px 0}.card h3{margin:0 0 8px}.secondary{color:var(--muted);font-size:13px}.hidden{display:none!important}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.timerdisplay{font-size:38px;font-weight:850;font-variant-numeric:tabular-nums;text-align:center;margin:10px}.timerbuttons{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}.fieldwide{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:#0d1217;color:var(--text);margin:5px 0 10px}.foot{font-size:12px;color:var(--muted);text-align:center;padding:20px 0}.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--accent);color:var(--accentText);padding:10px 16px;border-radius:12px;font-weight:750;display:none;z-index:5}
+@media(min-width:700px){.exercise-list{display:grid;grid-template-columns:1fr 1fr;gap:10px}.exercise{margin:0}.sessionhead{align-items:center}.stats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:420px){.daytabs{gap:5px}.daytab{font-size:13px}.daytab span{font-size:10px}.sets{grid-template-columns:1fr}.two{grid-template-columns:1fr}.stat strong{font-size:19px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Power · Hypertrophy · Performance</div>
+  <h1>Dein Trainingsplan</h1>
+  <p>4 Krafttage · Schulter- und Rückenfokus · Bankdrücken & Kreuzheben</p><p class="secondary">Tipp: Datei in Safari/Chrome öffnen (nicht nur in einer Datei-Vorschau), damit Navigation und Speicherung funktionieren.</p>
+  <div class="topbar">
+    <button class="primary" id="startBtn">Training starten</button>
+    <button id="timerToggle">Pausentimer</button>
+    <button class="ghost" id="exportBtn">Daten exportieren</button>
+    <button class="ghost" id="importBtn">Importieren</button>
+    <input type="file" id="importFile" accept=".json,application/json" class="hidden">
+  </div>
+</header>
+<main>
+  <div class="stats">
+    <div class="stat"><strong id="doneStat">0/0</strong><span>Übungen erledigt</span></div>
+    <div class="stat"><strong id="setStat">0</strong><span>Sätze abgehakt</span></div>
+    <div class="stat"><strong id="weekStat">4 Tage</strong><span>Krafttraining pro Woche</span></div>
+  </div>
+  <nav class="daytabs" aria-label="Trainingstage">
+    <button type="button" class="daytab active" data-day="0">TAG 1<span>Deadlift & Back</span></button>
+    <button type="button" class="daytab" data-day="1">TAG 2<span>Bench & Shoulders</span></button>
+    <button type="button" class="daytab" data-day="2">TAG 3<span>Legs & Calves</span></button>
+    <button type="button" class="daytab" data-day="3">TAG 4<span>Upper & Shoulders</span></button>
+  </nav>
+  <section class="card" id="timerCard">
+    <h3>Pausentimer</h3>
+    <p class="secondary">Starte die Pause zwischen den Arbeitssätzen. Du kannst die Dauer anpassen.</p>
+    <div class="two">
+      <div><label for="timerSeconds">Pausendauer (Sekunden)</label><input id="timerSeconds" class="fieldwide" type="number" min="10" max="900" value="150"></div>
+      <div><label for="timerPreset">Schnellauswahl</label><select id="timerPreset" class="fieldwide"><option value="60">60 s · Isolation</option><option value="90">90 s · Zubehör</option><option value="150" selected>150 s · Standard</option><option value="240">240 s · Schwerer Grundsatz</option></select></div>
+    </div>
+    <div class="timerdisplay" id="timerDisplay">02:30</div>
+    <div class="timerbuttons"><button class="primary" id="timerStart">Start</button><button id="timerPause">Pause</button><button id="timerReset">Reset</button></div>
+  </section>
+  <div class="sessionhead">
+    <div><h2 id="dayTitle">Tag 1 – Deadlift & Back Width</h2><p id="daySubtitle">Kreuzheben zuerst · Pull-ups einmal pro Woche</p></div>
+    <button class="small" id="resetDay">Tag zurücksetzen</button>
+  </div>
+  <div class="progress"><div id="progressBar"></div></div>
+  <div id="exerciseList" class="exercise-list"></div>
+  <section class="card">
+    <h3>Trainingsnotizen</h3>
+    <p class="secondary">Notizen zur heutigen Einheit, Tagesform oder Technik.</p>
+    <textarea id="sessionNotes" class="fieldwide" rows="3" placeholder="z. B. Schlaf, Energie, Schmerzen, Hockey-/Zwift-Belastung …"></textarea>
+    <div class="actions"><button class="primary" id="finishBtn">Einheit abschließen</button><button id="historyBtn">Trainingsverlauf</button></div>
+    <div id="history" class="hidden"></div>
+  </section>
+  <section class="card">
+    <h3>Progressionsregeln</h3>
+    <ul>
+      <li><b>Top-Set:</b> schwerster Arbeitssatz. Bankdrücken meist mit 1–2 RIR, Kreuzheben meist mit 2–3 RIR.</li>
+      <li><b>Back-off:</b> Folgesatz mit etwa 5–10 % weniger Gewicht; sauber und kontrolliert.</li>
+      <li><b>Doppelte Progression:</b> Erst Wiederholungen steigern, dann Gewicht erhöhen, wenn die obere Grenze technisch sauber erreicht ist.</li>
+      <li><b>RIR:</b> „Reps in Reserve“ – geschätzte saubere Wiederholungen, die noch möglich gewesen wären.</li>
+      <li><b>Pull-ups:</b> Ein Satz maximaler sauberer Wiederholungen; kein Schwung. Bei vielen Wiederholungen Zusatzgewicht notieren.</li>
+      <li><b>Schulter:</b> Seitheben kontrolliert, schmerzfreier Bewegungsumfang, meist 0–2 RIR. Keine erzwungenen Wiederholungen.</li>
+    </ul>
+    <p class="secondary">Deine Einträge werden automatisch lokal in diesem Browser gespeichert. Exportiere gelegentlich ein Backup, um deine Daten zu sichern oder auf ein anderes Gerät zu übertragen.</p>
+  </section>
+  <div class="foot">Trainiere technisch sauber. Bei stechendem Schmerz abbrechen und die Belastung prüfen.</div>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+const plan = [
+ {title:"Tag 1 – Deadlift & Back Width",subtitle:"Kreuzheben zuerst · Pull-ups einmal pro Woche",exercises:[
+  {name:"Konventionelles Kreuzheben",sets:[{label:"Top-Set",reps:"4–6"},{label:"Back-off",reps:"6–8"}],note:"Top-Set meist 2–3 RIR. Back-off etwa 5–10 % leichter; jede Wiederholung technisch sauber."},
+  {name:"Pull-ups",sets:[{label:"Maximaler Satz",reps:"saubere Max-Wdh."}],note:"Ein Satz bis zum technischen Versagen. Kein Kipping/Schwung. Zusatzgewicht bei Bedarf notieren."},
+  {name:"Breiter Latzug zur Brust",sets:[{label:"Satz 1",reps:"8–12"},{label:"Satz 2",reps:"8–12"}],note:"Kontrollierte Dehnung oben, Ellbogen Richtung Hüfte ziehen."},
+  {name:"Brustgestütztes Rudern",sets:[{label:"Satz 1",reps:"8–12"},{label:"Satz 2",reps:"8–12"}],note:"Oberen Rücken trainieren, ohne Schwung."},
+  {name:"Reverse Cable Flyes",sets:[{label:"Satz 1",reps:"12–20"},{label:"Satz 2",reps:"12–20"},{label:"Satz 3",reps:"12–20"}],note:"Hintere Schulter; kontrollierte Bewegung, kein Schwung."},
+  {name:"Stehendes Wadenheben",sets:[{label:"Satz 1",reps:"8–12"},{label:"Satz 2",reps:"8–12"},{label:"Satz 3",reps:"8–12"}],note:"In der gedehnten Position kurz pausieren; volle schmerzfreie Bewegungsamplitude."}
+ ]},
+ {title:"Tag 2 – Bench & Shoulder Width",subtitle:"Bankdrücken zuerst · seitliche Schulter priorisieren",exercises:[
+  {name:"Flachbankdrücken mit Langhantel",sets:[{label:"Top-Set",reps:"4–6"},{label:"Back-off",reps:"6–8"}],note:"Top-Set meist 1–2 RIR. Sicherheitsablagen oder Spotter verwenden."},
+  {name:"Schrägbankdrücken – Smith Machine",sets:[{label:"Satz 1",reps:"6–10"},{label:"Satz 2",reps:"6–10"}],note:"Bankneigung ungefähr 30°. Kontrollierte Exzentrik."},
+  {name:"Seitheben am Kabelzug",sets:[{label:"Satz 1",reps:"10–15"},{label:"Satz 2",reps:"10–15"},{label:"Satz 3",reps:"10–15"},{label:"Satz 4",reps:"10–15"}],note:"Seitliche Schulter. Nicht mit dem Oberkörper reißen; meist 0–2 RIR."},
+  {name:"Reverse Cable Flyes",sets:[{label:"Satz 1",reps:"12–20"}],note:"Zusätzlicher direkter Reiz für die hintere Schulter."},
+  {name:"Trizeps-Kabelstrecken",sets:[{label:"Satz 1",reps:"10–15"},{label:"Satz 2",reps:"10–15"}],note:"Ellbogen möglichst stabil halten."}
+ ]},
+ {title:"Tag 3 – Legs & Calves",subtitle:"Quadrizeps-Schwerpunkt · Beinermüdung mit Hockey und Zwift abstimmen",exercises:[
+  {name:"Hackenschmidt-Kniebeuge",sets:[{label:"Satz 1",reps:"6–10"},{label:"Satz 2",reps:"6–10"},{label:"Satz 3",reps:"6–10"}],note:"Tiefe, die du kontrolliert und schmerzfrei halten kannst."},
+  {name:"Beinstrecker",sets:[{label:"Satz 1",reps:"10–15"},{label:"Satz 2",reps:"10–15"},{label:"Satz 3",reps:"10–15"}],note:"Direkter Quadrizepsreiz; kontrollierte Bewegung."},
+  {name:"Beinbeuger sitzend",sets:[{label:"Satz 1",reps:"8–12"},{label:"Satz 2",reps:"8–12"}],note:"Kontrollierte Dehnung und Beugung; nicht mit dem Oberkörper reißen."},
+  {name:"Sitzendes Wadenheben",sets:[{label:"Satz 1",reps:"10–15"},{label:"Satz 2",reps:"10–15"},{label:"Satz 3",reps:"10–15"}],note:"Betont den Soleus; unten kurz in der Dehnung pausieren."},
+  {name:"Stehendes Wadenheben",sets:[{label:"Satz 1",reps:"8–12"},{label:"Satz 2",reps:"8–12"}],note:"Betont stärker den Gastrocnemius; volle Bewegungsamplitude."}
+ ]},
+ {title:"Tag 4 – Upper Volume & 3D Shoulders",subtitle:"Oberkörpervolumen · zweite große Einheit für seitliche Schulter",exercises:[
+  {name:"Brustpresse an der Maschine",sets:[{label:"Satz 1",reps:"8–12"},{label:"Satz 2",reps:"8–12"}],note:"Kontrollierte Wiederholungen, keine schmerzende Tiefe erzwingen."},
+  {name:"Neutraler Latzug",sets:[{label:"Satz 1",reps:"8–12"},{label:"Satz 2",reps:"8–12"}],note:"Latissimus-Fokus; Brust aufrecht, kein übermäßiges Zurücklehnen."},
+  {name:"Einarmiges Kabelrudern",sets:[{label:"Satz 1",reps:"10–12"},{label:"Satz 2",reps:"10–12"}],note:"Beide Seiten mit kontrolliertem Bewegungsumfang."},
+  {name:"Seitheben an der Maschine",sets:[{label:"Satz 1",reps:"12–20"},{label:"Satz 2",reps:"12–20"},{label:"Satz 3",reps:"12–20"},{label:"Satz 4",reps:"12–20"},{label:"Satz 5",reps:"12–20"},{label:"Satz 6",reps:"12–20"}],note:"Seitliche Schulter. Saubere Wiederholungen, bei Bedarf zwischen den Sätzen ausreichend pausieren."},
+  {name:"Reverse Cable Flyes",sets:[{label:"Satz 1",reps:"12–20"},{label:"Satz 2",reps:"12–20"}],note:"Ergänzt die hintere Schulter; keine Schwungbewegung."},
+  {name:"Schrägbank-Bizepscurls mit Kurzhanteln",sets:[{label:"Satz 1",reps:"8–12"},{label:"Satz 2",reps:"8–12"}],note:"Oberarme stabil halten, kontrolliert absenken."},
+  {name:"Trizepsstrecken über Kopf am Kabel",sets:[{label:"Satz 1",reps:"10–15"},{label:"Satz 2",reps:"10–15"}],note:"Dehnung unter Kontrolle, Ellbogen stabil."}
+ ]}
+];
+const KEY="powerHypertrophyApp_v1";
+let state={records:{},history:[],activeDay:0};
+let currentDay=0, timerRemaining=150, timerInterval=null, timerRunning=false;
+const $=id=>document.getElementById(id);
+function load(){
+ try {
+  const raw=window.localStorage.getItem(KEY);
+  if(raw){
+   const parsed=JSON.parse(raw);
+   if(parsed && typeof parsed === "object") state={...state,...parsed,records:parsed.records||{},history:Array.isArray(parsed.history)?parsed.history:[]};
+  }
+ } catch(e) { console.warn("Gespeicherte Trainingsdaten konnten nicht geladen werden.",e); }
+}
+function save(){
+ try { window.localStorage.setItem(KEY,JSON.stringify(state)); }
+ catch(e) { console.warn("Lokales Speichern nicht verfügbar.",e); toast("Browser-Speicher nicht verfügbar. Bitte Daten regelmäßig exportieren."); }
+}
+function recordKey(day){return new Date().toISOString().slice(0,10)+"_day"+day;}
+function getRecord(day){const key=recordKey(day);if(!state.records[key])state.records[key]={checks:{},values:{},notes:""};return state.records[key];}
+function safe(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function render(){
+ const d=plan[currentDay], rec=getRecord(currentDay);
+ $("dayTitle").textContent=d.title;$("daySubtitle").textContent=d.subtitle;
+ document.querySelectorAll(".daytab").forEach(b=>b.classList.toggle("active",+b.dataset.day===currentDay));
+ $("sessionNotes").value=rec.notes||"";
+ let html="", total=0, checked=0, checkedExercises=0;
+ d.exercises.forEach((ex,ei)=>{
+  const done=ex.sets.every((_,si)=>rec.checks[ei+"_"+si]);
+  if(done)checkedExercises++;
+  html+=`<article class="exercise ${done?"done":""}"><div class="exhead"><div class="num">${ei+1}</div><div class="exmain"><div class="exname">${safe(ex.name)}</div><div class="exmeta">${ex.sets.length} Arbeitssatz${ex.sets.length>1?"s":""} · ${safe(ex.sets.map(s=>s.reps).join(" / "))} Wdh.</div></div><input class="check" type="checkbox" aria-label="Übung erledigt" data-exdone="${ei}" ${done?"checked":""}></div><div class="sets">`;
+  ex.sets.forEach((set,si)=>{
+   total++;if(rec.checks[ei+"_"+si])checked++;
+   const v=rec.values[ei+"_"+si]||{};
+   html+=`<div class="setbox"><div class="settitle">${safe(set.label)} · ${safe(set.reps)} Wdh.</div><div class="fields"><div class="field"><label>Gewicht (kg)</label><input type="number" min="0" step="0.5" placeholder="kg" data-val="${ei}_${si}_weight" value="${safe(v.weight??"")}"></div><div class="field"><label>Wiederholungen</label><input type="number" min="0" step="1" placeholder="Wdh." data-val="${ei}_${si}_reps" value="${safe(v.reps??"")}"></div></div><label style="display:flex;align-items:center;gap:7px;margin-top:9px;font-size:13px;color:var(--muted)"><input type="checkbox" class="check" style="width:19px;height:19px" data-setcheck="${ei}_${si}" ${rec.checks[ei+"_"+si]?"checked":""}> Satz erledigt</label></div>`;
+  });
+  html+=`</div>${ex.note?`<div class="exnote">${safe(ex.note)}</div>`:""}</article>`;
+ });
+ $("exerciseList").innerHTML=html;
+ $("doneStat").textContent=checkedExercises+"/"+d.exercises.length;
+ $("setStat").textContent=checked;
+ $("progressBar").style.width=(total?checked/total*100:0)+"%";
+ $("exerciseList").querySelectorAll("[data-setcheck]").forEach(el=>el.addEventListener("change",e=>{rec.checks[e.target.dataset.setcheck]=e.target.checked;save();render();}));
+ $("exerciseList").querySelectorAll("[data-exdone]").forEach(el=>el.addEventListener("change",e=>{const ei=+e.target.dataset.exdone;plan[currentDay].exercises[ei].sets.forEach((_,si)=>rec.checks[ei+"_"+si]=e.target.checked);save();render();}));
+ $("exerciseList").querySelectorAll("[data-val]").forEach(el=>el.addEventListener("change",e=>{const [ei,si,field]=e.target.dataset.val.split("_");const k=ei+"_"+si;rec.values[k]=rec.values[k]||{};rec.values[k][field]=e.target.value;save();}));
+}
+function toast(msg){const el=$("toast");el.textContent=msg;el.style.display="block";clearTimeout(toast._t);toast._t=setTimeout(()=>el.style.display="none",2300);}
+function selectDay(day){currentDay=day;state.activeDay=day;save();render();window.scrollTo({top:0,behavior:"smooth"});}
+// Delegierte Navigation: funktioniert auch, wenn der Inhalt später neu gerendert wird.
+document.querySelector(".daytabs").addEventListener("click", e=>{
+ const btn=e.target.closest("button[data-day]");
+ if(!btn) return;
+ const day=Number(btn.dataset.day);
+ if(Number.isInteger(day) && day>=0 && day<plan.length) selectDay(day);
+});
+$("startBtn").addEventListener("click",()=>{document.querySelector(".sessionhead").scrollIntoView({behavior:"smooth"});toast("Einheit bereit – hake deine Sätze nach dem Training ab.");});
+$("resetDay").addEventListener("click",()=>{if(confirm("Alle Satz-Häkchen, Gewichte und Wiederholungen für diesen Tag und das heutige Datum zurücksetzen?")){delete state.records[recordKey(currentDay)];save();render();toast("Heutiger Trainingstag zurückgesetzt.");}});
+$("sessionNotes").addEventListener("input",e=>{getRecord(currentDay).notes=e.target.value;save();});
+$("finishBtn").addEventListener("click",()=>{
+ const rec=getRecord(currentDay),d=plan[currentDay];
+ const entry={date:new Date().toISOString(),day:currentDay,title:d.title,notes:rec.notes||"",values:JSON.parse(JSON.stringify(rec.values||{})),checks:JSON.parse(JSON.stringify(rec.checks||{}))};
+ state.history.unshift(entry);state.history=state.history.slice(0,100);save();toast("Einheit im Trainingsverlauf gespeichert.");renderHistory();
+});
+$("historyBtn").addEventListener("click",()=>{const h=$("history");h.classList.toggle("hidden");renderHistory();});
+function renderHistory(){
+ const h=$("history");if(!state.history.length){h.innerHTML='<p class="secondary">Noch keine abgeschlossenen Einheiten.</p>';return;}
+ h.innerHTML="<h3 style='margin-top:14px'>Letzte Einheiten</h3>"+state.history.slice(0,20).map((e,i)=>`<div style="border-top:1px solid var(--line);padding:10px 0"><b>${safe(e.title)}</b><div class="secondary">${new Date(e.date).toLocaleString("de-CH")}</div>${e.notes?`<div class="secondary">${safe(e.notes)}</div>`:""}<button class="small" data-history="${i}" style="margin-top:6px">Details</button><div class="hidden" id="histdetail${i}"></div></div>`).join("");
+ h.querySelectorAll("[data-history]").forEach(b=>b.addEventListener("click",()=>{const i=+b.dataset.history,e=state.history[i],el=$("histdetail"+i);el.classList.toggle("hidden");if(!el.dataset.ready){let lines=[];plan[e.day].exercises.forEach((ex,ei)=>ex.sets.forEach((s,si)=>{const v=(e.values||{})[ei+"_"+si]||{};if(v.weight||v.reps)lines.push(`${ex.name} — ${s.label}: ${v.weight||"–"} kg × ${v.reps||"–"} Wdh.`)}));el.innerHTML='<p class="secondary">'+(lines.length?lines.map(safe).join("<br>"):"Keine Gewichts-/Wiederholungswerte eingetragen.")+'</p>';el.dataset.ready="1";}}));
+}
+$("exportBtn").addEventListener("click",()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="trainingsdaten-power-hypertrophy.json";a.click();URL.revokeObjectURL(url);toast("Export gestartet.");});
+$("importBtn").addEventListener("click",()=>$("importFile").click());
+$("importFile").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());if(!data||typeof data!=="object"||!data.records)throw Error();if(confirm("Import ersetzt deine derzeit gespeicherten Trainingsdaten. Fortfahren?")){state={records:{},history:[],activeDay:0,...data};currentDay=Number(state.activeDay)||0;save();render();renderHistory();toast("Daten importiert.");}}catch(err){alert("Die Datei ist ungültig oder kein passender Trainingsdaten-Export.");}e.target.value="";});
+function updateTimer(){const m=Math.floor(timerRemaining/60),s=timerRemaining%60;$("timerDisplay").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");}
+$("timerPreset").addEventListener("change",e=>{$("timerSeconds").value=e.target.value;timerRemaining=+e.target.value;updateTimer();});
+$("timerSeconds").addEventListener("change",e=>{timerRemaining=Math.max(10,Math.min(900,+e.target.value||150));e.target.value=timerRemaining;updateTimer();});
+$("timerStart").addEventListener("click",()=>{if(timerRunning)return;timerRunning=true;timerInterval=setInterval(()=>{timerRemaining--;updateTimer();if(timerRemaining<=0){clearInterval(timerInterval);timerRunning=false;timerRemaining=0;updateTimer();toast("Pause beendet – nächster Satz, wenn du bereit bist.");if("vibrate" in navigator)navigator.vibrate([200,100,200]);}},1000);});
+$("timerPause").addEventListener("click",()=>{clearInterval(timerInterval);timerRunning=false;});
+$("timerReset").addEventListener("click",()=>{clearInterval(timerInterval);timerRunning=false;timerRemaining=Math.max(10,Math.min(900,+$("timerSeconds").value||150));updateTimer();});
+$("timerToggle").addEventListener("click",()=>{$("timerCard").classList.toggle("hidden");if(!$("timerCard").classList.contains("hidden"))$("timerCard").scrollIntoView({behavior:"smooth",block:"center"});});
+load();currentDay=Number(state.activeDay)||0;render();renderHistory();updateTimer();
+</script>
+</body>
+</html>
